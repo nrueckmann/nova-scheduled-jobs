@@ -12,6 +12,10 @@ class Authorize
 {
     public function handle(Request $request, Closure $next): Response
     {
-        return $next($request);
+        $tool = collect(Nova::registeredTools())->first(function(Tool $tool){
+            return $tool instanceof NovaScheduledJobsTool;
+        });
+
+        return optional($tool)->authorize($request) ? $next($request) : abort(403);
     }
 }
